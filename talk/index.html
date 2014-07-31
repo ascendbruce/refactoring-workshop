@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+
+    <title>Simplifying Code: Monster to Elegant in N<5 steps</title>
+
+    <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+    <meta name="author" content="Hakim El Hattab">
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link rel="stylesheet" href="css/reveal.min.css">
+    <link rel="stylesheet" href="css/theme/sky.css" id="theme">
+
+    <!-- For syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- If the query includes 'print-pdf', use the PDF print sheet -->
+    <script>
+      document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="reveal">
+
+      <!-- Any section element inside of this container is displayed as a slide -->
+      <div class="slides">
+
+<section>
+  <h1>Simplifying<br>Code</h1>
+  <br>
+  <h3>Monster to Elegant<br>in N<5 steps</h3>
+  <br>
+  <p>
+    <small>Tute Costa - <a href="http://twitter.com/tutec">@tutec</a></small>
+  </p>
+
+  <aside class="notes">
+  </aside>
+</section>
+
+<section data-transition="none">
+  <h2>Refactoring Patterns</h2>
+
+  <p>(And all these buzz words.)</p>
+
+  <aside class="notes">
+
+    A <strong>Pattern</strong> is a general reusable solution to a reccurring
+    problem. There's many ways to skin a cat, so how do we do X in this new
+    application? &nbsp; A <strong>Pattern</strong> is a description for how to
+    solve a problem that can be used in many different situations. Patterns
+    are peer-tested best practices.
+
+    <br><br>
+
+    <strong>Refactoring</strong> is restructuring existing code without
+    changing its behavior. Advantages are reduced complexity, more readable
+    code, and easier to maintain. Also useful for creating an expressive
+    architecture, so that our objects reflect objects in the real world,
+    improving cross-teams communications.
+
+    <br><br>
+
+    Refactoring Patterns, then... . Move on to first <strong>anomaly</strong>.
+
+  </aside>
+</section>
+
+<section data-transition="none">
+  <h3>Anomaly 1: Code doesn't read well</h3>
+
+Before: <pre style="margin:1em auto"><code data-trim contenteditable>
+if hash[row[1]][date] != row[0]
+  # ...
+</code></pre>
+
+After:
+<pre><code data-trim contenteditable>
+if remove_duplicates?(row, date)
+  # ...
+
+def remove_duplicates?(data, date)
+</code></pre>
+
+
+  <aside class="notes">
+    <li>Responsability of the code vs implementation details.
+    <li>Comments show at least what was in our mind when we wrote it.
+    <li>Comment are fragile: we edit the code and may forget to update the
+    comments when we see it working. "Lies waiting to happen".
+    <li>Idea: Extract relevant concepts into methods with <em>proper</em> names.
+    <li>Most relevant responsibilities should be at the top
+    <li>Code now reads itself, which is the most beautiful thing we can
+    achieve. The Ruby language takes pride on this: it does what you think it
+    does.
+    <li>Regarding "less code is better": Code grows with more lines, but also
+    <strong>readability</strong>. Still arguably it's actually shorter to
+    read, cause we don't really need to see how do we compute if there's
+    duplicates (implementation, low-level detail).
+  </aside>
+</section>
+
+<section data-transition="none">
+  <h3>Intention Revealing Method</h3>
+
+  <ol>
+    <li>Add <span style="color:blue">comments</span> if code needs it
+    <li>Transform comments into <span style="color:blue">methods</span>
+      <br>
+      <small>Transform them syntactically, then create the method.</small>
+    <li>Comments are now <span style="color:green">code</span>.<br>
+      Code <span style="color:green">describes</span> itself.
+  </ol>
+
+  <aside class="notes">
+  </aside>
+</section>
+
+<section data-transition="none">
+  <h3>Intention Revealing Method</h3>
+  <br>
+  <p style="color: green">&lt;5 lines per method</p>
+  <img src="imgs/sandi.jpeg"><br>
+  <p>No problem!</p>
+
+  <aside class="notes">
+    <li>Now it's easy, just extract out logic until you attain it or it doesn't improve.
+  </aside>
+</section>
+
+<section data-transition="none">
+  <h3>Intention Revealing Method</h3>
+  <br>
+  <p>It's arguably the <span style="color:green">easiest</span> pattern.</p>
+  <div class="fragment">
+    <img src="imgs/naming.png">
+    <p>But the <span style="color:red">hardest</span> as well.</p>
+  </div>
+
+  <aside class="notes">
+
+    Seemingly the easiest pattern (simple syntactical transformations), but
+    also the hardest because it implies naming. And naming is hard, it's true
+    that it's hard. And not only naming, but also deciding on the levels of
+    abstraction of the code: what counts as your app's responsability and
+    what as mere implementation details?
+
+    <br><br>
+
+    Apply changes, see before and after, does it look better? Keep it. Does it
+    not? Ignore it, you anyway learned something about your code! (Namely,
+    what doesn't make it better, ask Edison!)
+
+  </aside>
+</section>
+
+<section data-transition="none">
+  <h2>Anomaly 2: What is nil?</h2>
+  <h3 style="color:#d66; text-transform:none">Hint: it's a troublemaker.</h3>
+
+  <br>
+  <p>Source of hard to spot errors:</p>
+  <code style="color: blue; font-size: 140%">Undefined method `name' for nil</code>
+
+  <br>
+
+<pre><code data-trim contenteditable>
+session[:current_user]  # => nil
+if (false) then 1 end   # => nil
+empty_method()          # => nil
+</code></pre>
+
+  <aside class="notes">
+
+    Where did this nil come from in my whole code base? From a blog post? From
+    a user? From a car or whatever?
+
+    <br><br>
+
+    <li>Hash with a key that doesn't exist
+    <li>Hash with `nil` as value of the key
+    <li>In if that evaluates to false but there's no else branch
+    <li>An empty method
+
+  </aside>
+</section>
+
+<section data-transition="none">
+  <h2>Anomaly 2: What is nil?</h2>
+
+  <p>A <span style="color:green">symbol</span> is better than <code style="color:red">nil</code>:</p>
+
+<pre><code data-trim contenteditable>
+def current_user
+  User.find_by_id(params[:id]) ||
+  :guest_user
+end
+</code></pre>
+<pre><code data-trim contenteditable>
+current_user.name
+</code></pre>
+
+  <br>
+  <code style="color: blue; font-size: 140%">undefined method `name' for :guest_user:Symbol</code>
+
+  <aside class="notes">
+    Now we can find in project that symbol/trace the Nil.
+  </aside>
+</section>
+
+<section data-transition="none">
+  <h2>Anomaly 2: So many ifs!</h2>
+
+  <p>If there may be <code style="color:red">nil</code> we need to enclose it with an <code style="color:blue">if</code>:</p>
+  <pre><code data-trim contenteditable>
+if current_user
+  "Ohai, #{current_user.name}!"
+else
+  'Ohai, guest!'
+end
+  </code></pre>
+
+  <aside class="notes">
+
+    Do you know your name or do I need to specify what's the "name" for nil?
+
+    <br><br>
+
+    Easy to forget them. The logic of what does it mean an object
+    is nil is scattered accross the entire application.
+
+  </aside>
+</section>
+
+<section data-transition="none">
+  <h2>Pattern: Null Objects</h2>
+
+  <p>Instead of <code style="color:red">nil</code>, return a new
+    <span style="color:green">object</span></p>
+
+<pre><code data-trim contenteditable>
+class NullUser
+  def name
+    'guest'
+  end
+end
+</code></pre>
+<pre class="fragment"><code data-trim contenteditable>
+def current_user
+  User.find(session[:user_id]) ||
+  NullUser.new
+end
+</code></pre>
+<pre class="fragment"><code data-trim contenteditable>
+"Ohai, #{current_user.name}!"
+</code></pre>
+
+</section>
+
+
+<section>
+  <h2 style="font-size: 1.3em">Anomaly 3: Ginormous Method</h2>
+
+  <pre><code data-trim contenteditable style="font-size:120%">
+class ExportJob
+  # Instance variables
+  # Many other methods
+  # And...
+  def row_per_day_format(file_name)
+    file = File.open file_name, 'r:ISO-8859-1'
+    # hash[NivelConsistencia][date] = [[value, status]]
+    hash = { '1' => {}, '2' => {} }
+    dates = []
+    str = ''
+
+    CSV.parse(file, col_sep: ';').each do |row|
+      next if row.empty?
+      next if row[0] =~ /^\/\//
+      date = Date.parse(row[2])
+      (13..43).each do |i|
+        measurement_date = date + (i-13)
+
+        # If NumDiasDeChuva is empty it means no data
+        value  = row[7].nil? ? -99.9 : row[i]
+        status = row[i + 31]
+        hash_value = [value, status]
+
+        dates << measurement_date
+        hash[row[1]][measurement_date] = hash_value
+      end
+    end
+
+    dates.uniq.each do |date|
+      if !hash['1'][date].nil? && hash['2'][date].nil?
+        # Only 'bruto' (good)
+        value = hash['1'][date]
+        str << "#{date}\t#{value[0]}\t#{value[1]}\n"
+      elsif hash['1'][date].nil? && !hash['2'][date].nil?
+        # Only 'consistido' (kind of good)
+        value = hash['2'][date]
+        str << "#{date}\t#{value[0]}\t#{value[1]}\n"
+      else
+        # 'bruto' y 'consistido' (has new and old data)
+        old_value = hash['1'][date]
+        new_value = hash['2'][date]
+        str << "#{date}\t#{new_value[0]}\t#{old_value[1]}\t#{old_value[0]}\n"
+      end
+    end
+
+    str
+  end
+  </code></pre>
+
+  <aside class="notes">
+
+    "Where to even start" anxiety. The method is itslef like a whole class
+    with variables, code, different pieces of logic.
+
+    <br><br>
+
+    Any change has repercusions both for the method and for its containing
+    class, which was also big. An instance variable in this method is also
+    used in others. I can't even ...!
+
+    <br><br>
+
+    Refactoring a big method is hard because there's coupling to behavior in
+    the same class, changes here break something there and you have to
+    refactor it as well.
+
+    <br><br>
+
+    Turn imperative styled code into OO!
+
+    <br><br>
+
+    There's too much context, we have to isolate the long method so that
+    any change we make affects only that method, and nothing else.
+
+  </aside>
+</section>
+
+<section data-transition="none">
+  <h2 style="font-size: 1.3em">Replace Method with Method Object</h2>
+  <p>1/4. Create a <span style="color:green">class</span> with same initialization arguments as BIG method</p>
+<pre><code data-trim contenteditable>
+class FormatAtoB
+  def initialize(file_name)
+    @file_name = file_name
+  end
+end
+</code></pre>
+</section>
+
+<section data-transition="none">
+  <h2 style="font-size: 1.3em">Replace Method with Method Object</h2>
+  <p>2/4. Copy & Paste the method's <span style="color:blue">body</span> in the new class, with no arguments</p>
+<pre><code data-trim contenteditable>
+class FormatAtoB
+  def initialize(file_name)
+    @file_name = file_name
+  end
+
+  def row_per_day_format
+    file = File.open file_name, 'r:ISO-8859-1'
+    # hash[NivelConsistencia][date] = [[value, status]]
+    hash = { '1' => {}, '2' => {} }
+    dates = []
+    str = ''
+
+    CSV.parse(file, col_sep: ';').each do |row|
+      next if row.empty?
+      next if row[0] =~ /^\/\//
+      date = Date.parse(row[2])
+      (13..43).each do |i|
+        measurement_date = date + (i-13)
+
+        # If NumDiasDeChuva is empty it means no data
+        value  = row[7].nil? ? -99.9 : row[i]
+        status = row[i + 31]
+        hash_value = [value, status]
+
+        dates << measurement_date
+        hash[row[1]][measurement_date] = hash_value
+      end
+    end
+
+    dates.uniq.each do |date|
+      if !hash['1'][date].nil? && hash['2'][date].nil?
+        # Only 'bruto' (good)
+        value = hash['1'][date]
+        str << "#{date}\t#{value[0]}\t#{value[1]}\n"
+      elsif hash['1'][date].nil? && !hash['2'][date].nil?
+        # Only 'consistido' (kind of good)
+        value = hash['2'][date]
+        str << "#{date}\t#{value[0]}\t#{value[1]}\n"
+      else
+        # 'bruto' y 'consistido' (has new and old data)
+        old_value = hash['1'][date]
+        new_value = hash['2'][date]
+        str << "#{date}\t#{new_value[0]}\t#{old_value[1]}\t#{old_value[0]}\n"
+      end
+    end
+
+    str
+  end
+end
+</code></pre>
+</section>
+
+<section data-transition="none">
+  <h2 style="font-size: 1.3em">Replace Method with Method Object</h2>
+  <p>3/4. <span style="color:blue">Replace</span> original method with a call to the new class</p>
+<pre><code data-trim contenteditable>
+def row_per_day_format(file_name)
+  FormatAtoB.new(file_name).row_per_day_format
+end
+</code></pre>
+</section>
+
+<section data-transition="none">
+  <h2 style="font-size: 1.3em">Replace Method with Method Object</h2>
+  <p>4/4. Apply "<span style="color:green">Intention Revealing Method</span>" to the class. Voilà.</p>
+<pre><code data-trim contenteditable>
+class FormatAtoB
+  def initialize(file_name)
+    @file_name = file_name
+  end
+
+  def row_per_day_format
+    load_file_a
+    format_data
+  end
+
+  private
+
+  def load_file_a
+    # [...]
+  end
+end
+</code></pre>
+</section>
+
+<section data-transition="none">
+  <h2 style="font-size: 1.3em">Replace Method with Method Object</h2>
+  <h3>&nbsp;</h3>
+
+  <a target="_blank" href="http://confreaks.com/videos/1071-cascadiaruby2012-therapeutic-refactoring">http://confreaks.com/videos/1071-cascadiaruby2012-therapeutic-refactoring</a>
+</section>
+
+
+<section data-transition="none">
+  <h2 style="font-size: 1.3em">We covered</h2>
+
+  <p><span style="color:blue">Intention Revealing Method</span>
+    <small>Turns comments unnecessary. Code reads better.</small></p>
+
+  <p><span style="color:blue">Null Objects</span><br>
+    <small>Avoids nil objects and <code>if</code>s.</small></p>
+
+  <p><span style="color:blue">Replace Method with Method Object</span>
+    <small>Refactor big methods at ease in a clean new container.</small></p>
+
+  <h2 style="font-size: 1.3em">Do you have questions?</h2>
+</section>
+
+
+<section data-transition="none">
+  <h2>Next Steps: "<a target="_blank" href="http://robots.thoughtbot.com/sandi-metz-rules-for-developers">4 rules</a>"</h2>
+
+  <ol>
+    <li>Classes of <span style="color:green">at most 100 lines of code</span>
+    <li>Methods of <span style="color:green">at most 5 lines of code</span>
+    <li>A method accepts <span style="color:green">at most 4 arguments</span>
+    <li>A controller instantiates <span style="color:green">only one object</span>
+  </ol>
+
+  <aside class="notes">
+    <p>They are simple to explain and grasp, and encode many best practices.</p>
+
+    <p>There's dozens of refactoring and design patterns, there's
+      many different software-related metrics.</p>
+
+    <p>No need to be an erudite: follow the four rules as they lead to green
+      pastures.</p>
+  </aside>
+</section>
+
+<section>
+  <h2>Why Refactoring</h2>
+  <ul>
+    <li>Not only about <span style="color:blue">aesthetics</span>,
+      but <span style="color:green">shared understanding, bug-chase, performance</span>.
+    <li class="fragment">
+      We work with the tools with which we work. We are
+      <span style="color:green">users</span> and <span style="color:red">creators</span>.
+    <li class="fragment">
+      If I have a bias I choose
+      "<span style="color:green">over-engineering</span>".
+      "<span style="color:blue">Under-engineering</span>" is
+      <span style="color:red">risky, expensive</span>,
+      and <span style="color:red">over-crowded</span>.
+  </ul>
+</section>
+
+<section>
+  <h2>El Fin</h2>
+
+  <img src="imgs/responsibility.png"><br>
+  <a target="_blank" href="https://twitter.com/tutec">@tutec</a>
+  -
+  <a target="_blank" href="https://github.com/tute">github.com/tute</a>
+</section>
+
+      </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.min.js"></script>
+
+    <script>
+
+      // Full list of configuration options available here:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+        transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+        // Parallax scrolling
+        // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+        // parallaxBackgroundSize: '2100px 900px',
+
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+          { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+          { src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+          { src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+        ]
+      });
+    </script>
+
+  </body>
+</html>
