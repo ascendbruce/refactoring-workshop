@@ -28,16 +28,7 @@ class ProjectsController < ApplicationController
     if @project.update(project_params)
 
       # FIXME: 2 Move controller logic into model
-      if @project.is_featured?
-        if @project.created_at > 1.week.ago
-          @project.label = "new featured"
-        else
-          @project.label = "featured"
-        end
-      else
-        @project.label = "normal"
-      end
-      @project.save
+      @project.update_label
 
       redirect_to @project, notice: 'Project was successfully updated.'
     else
