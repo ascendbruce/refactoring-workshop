@@ -6,20 +6,11 @@ class ProjectsController < ApplicationController
   def index
     # FIXME: 1. Intention Revealing Method
 
-    # When user is admitted we show it's active projects
-    if current_user && current_user.projects.exists?
+    if user_is_admitted?
       @projects = current_user.active_projects
     else
-      # If not admitted we show some featured projects
       @projects = Project.featured
-
-      # set a marketing flash if user is new,
-      # and a special price for user who signed up less than a week ago
-      if current_user && current_user.created_at >= 1.week.ago
-        flash.now[:notice] = 'Upgrade and get 20% off for having your own projects!'
-      elsif current_user && current_user.created_at < 1.week.ago
-        flash.now[:notice] = 'Upgrade for having your own projects!'
-      end
+      set_flash_for_not_admitted_user
     end
   end
 
@@ -79,5 +70,27 @@ class ProjectsController < ApplicationController
 
   def project_params
     params.require(:project).permit(:title, :description, :is_featured)
+  end
+
+  private
+
+  def user_is_admitted?
+    current_user && current_user.projects.exists?
+  end
+
+  def set_flash_for_not_admitted_user
+    if new_free_user?
+      flash.now[:notice] = 'Upgrade and get 20% off for having your own projects!'
+    elsif old_free_user?
+      flash.now[:notice] = 'Upgrade for having your own projects!'
+    end
+  end
+
+  def new_free_user?
+    current_user && current_user.created_at >= 1.week.ago
+  end
+
+  def old_free_user?
+    current_user && current_user.created_at < 1.week.ago
   end
 end
