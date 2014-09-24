@@ -25,13 +25,15 @@ class UsersController < ApplicationController
   end
 
   def edit
-    @user = User.find(params[:id])
-    @user.profile ||= @user.build_profile
+    @user_update_form = UserUpdateForm.new(params[:id])
+    # @user = User.find(params[:id])
+    # @user.profile ||= @user.build_profile
   end
 
   def update
-    if @user.update(user_params)
-      redirect_to @user, notice: 'User was successfully updated.'
+    @user_update_form = UserUpdateForm.new(params[:id])
+    if @user_update_form.update(user_params)
+      redirect_to user_path(@user_update_form.user), notice: 'User was successfully updated.'
     else
       render :edit
     end
@@ -52,6 +54,6 @@ class UsersController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def user_params
-    params.require(:user).permit(:email, profile_attributes: [:id, :nickname, :bio] )
+    params.require(:user_update_form).permit(:email,:id, :nickname, :bio)
   end
 end
