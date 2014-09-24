@@ -1,12 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>CodeClubTaipeiFormObject</title>
+  <title>Rails Refactoring Workshop</title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
 </head>
 <body>
+
+<nav>
+  Refaacting Workshop |
+  <%= link_to "users", users_path %> |
+  <%= link_to "projects", projects_path %> |
+
+  <%# FIXME bouns: move to partial or helper %>
+  <% if current_user %>
+    <%= current_user.profile_nickname %>
+    <%= link_to "Logout", "" %>
+  <% else %>
+    <%= link_to "Login",  "" %>
+  <% end %>
+</nav>
+
+<% if notice %>
+  <p id="notice"><%= notice %></p>
+<% end %>
 
 <%= yield %>
 

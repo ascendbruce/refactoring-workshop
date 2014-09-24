@@ -1,0 +1,28 @@
+<p>
+  <strong>Email:</strong>
+  <%= @user.email %>
+</p>
+
+
+<% if @user.profile.present? %>
+
+  <h2>Profile</h2>
+
+  <p>
+    <strong>Nickname</strong>
+    <%= @user.profile.nickname %>
+  </p>
+
+  <p>
+    <strong>Bio</strong>
+    <%= @user.profile.bio %>
+  </p>
+
+<% else %>
+
+  <p>Profile not avaliable</p>
+
+<% end %>
+
+<%= link_to 'Edit', edit_user_path(@user) %> |
+<%= link_to 'Back', users_path %>
