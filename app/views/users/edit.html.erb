@@ -1,12 +1,12 @@
 <h1>Editing user</h1>
 
-<%= form_for(@user) do |f| %>
-  <% if @user.errors.any? %>
+<%= form_for(@user_update_form, url: user_path(@user_update_form.user)) do |f| %>
+  <% if @user_update_form.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h2>
+      <h2><%= pluralize(@user_update_form.errors.count, "error") %> prohibited this user from being saved:</h2>
 
       <ul>
-      <% @user.errors.full_messages.each do |message| %>
+      <% @user_update_form.errors.full_messages.each do |message| %>
         <li><%= message %></li>
       <% end %>
       </ul>
@@ -18,24 +18,20 @@
     <%= f.text_field :email %>
   </div>
 
-  <%= f.fields_for :profile, @user.profile do |ff| %>
+  <h2>Profile</h2>
 
-    <h2>Profile</h2>
+  <div class="field">
+    <%= f.label :nickname %><br>
+    <%= f.text_field :nickname %>
+  </div>
 
-    <div class="field">
-      <%= ff.label :nickname %><br>
-      <%= ff.text_field :nickname %>
-    </div>
-
-    <div class="field">
-      <%= ff.label :bio %><br>
-      <%= ff.text_area :bio, rows: 5, cols: 40 %>
-    </div>
-
-  <% end %>
+  <div class="field">
+    <%= f.label :bio %><br>
+    <%= f.text_area :bio, rows: 5, cols: 40 %>
+  </div>
 
   <div class="actions">
-    <%= f.submit %>
+    <%= f.submit "Update User" %>
   </div>
 <% end %>
 

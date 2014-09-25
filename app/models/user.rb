@@ -18,27 +18,17 @@ class User < ActiveRecord::Base
 
   # FIXME: 4. Service Object
   def subscribe
-    api_result = try_api { PaymentGateway.subscribe }
-    if api_result == :success
-      update_attributes(subscription_plan: "monthly")
-    end
-    api_result
+    subscribe_service.subscribe
   end
 
   def unsubscribe
-    api_result = try_api { PaymentGateway.unsubscribe }
-    if api_result == :success
-      update_attributes(subscription_plan: nil)
-    end
-    api_result
+    subscribe_service.unsubscribe
   end
 
   private
 
-  def try_api
-    yield
-  rescue => e
-    Rails.logger.error "API call failed. message: #{e.message}"
-    return :network_error
+  def subscribe_service
+    @subscribe_service ||= SubscribeService.new(self)
   end
+
 end
